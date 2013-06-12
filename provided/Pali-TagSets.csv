@@ -1,0 +1,70 @@
+﻿part of speech	
+	@comma@
+	@point@
+	@quote@
+	@sandhi@
+	@semicolon@
+	absolutive
+	adjective
+	adverb
+	conjunction
+	coordinative conjunciton
+	demonstrative adverb
+	demonstrative personal pronoun
+	demonstrative pronoun
+	emphatic particle
+	future passive participle
+	indefinite personal pronoun
+	indefinite pronoun
+	infinitive
+	interrogative pronoun
+	noun
+	numeral
+	ordinal adjective
+	past active participle
+	past participle
+	past passive participle
+	personal pronoun
+	persornal pronoun
+	present active participle
+	present participle
+	present passive participle
+	pronoun
+	proper noun
+	quotation participle
+	relative personal pronoun
+	relative pronoun
+	verb
+case	
+	ablative
+	accusative
+	dative
+	genitive
+	instrumental
+	locative
+	nominative
+	vocative
+number	
+	dual
+	plural
+	singular
+gender	
+	feminine
+	masculine
+	masculine/ neuter
+	neuter
+person	
+	first person
+	second person
+	third person
+time	
+	aorist
+	future
+	present
+mode	
+	imperative
+	indicative
+	optative
+genus verbi	
+	active
+	passive
