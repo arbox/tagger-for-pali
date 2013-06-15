@@ -1,0 +1,9 @@
+1	an
+2	Erst
+1	.
+2	dann
+1	gut
+1	Der
+2	und
+2	verschlafen
+2	.
