@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.PrintStream;
 import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -12,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -25,6 +28,7 @@ public class TaggerGUI implements ActionListener{
 	private JComboBox cb;
 	private JFileChooser fc;
 	private JTextArea log;
+	private JScrollPane scroll;
 	private String prefix;
 	private String[] taggerlist;
 	private Tagger[] taggers;
@@ -33,6 +37,7 @@ public class TaggerGUI implements ActionListener{
 		Config();
 		
 		f.setVisible(true);
+		
 	}
 	
 	
@@ -45,9 +50,9 @@ public class TaggerGUI implements ActionListener{
 		// initialize the used objects
 		f  = new JFrame();
 		fc = new JFileChooser(System.getProperty("user.dir"));
-		prefix = "[ElePali] - ";
 		taggerlist = new String[2];
 		taggers   = new Tagger[2];
+		prefix = " [Unigram Tagger] - ";
 		
 		// config the Frame itself
 		f.setIconImage(new ImageIcon("data/icon.png").getImage()); 
@@ -65,8 +70,8 @@ public class TaggerGUI implements ActionListener{
 		taggerlist[0] = "Unigram Tagger";
 		taggerlist[1] = "Bigram Tagger";
 		
-		taggers[0] = new UniTagger();
-		taggers[1] = new UniTagger();
+		taggers[0] = new UniTagger(this);
+		taggers[1] = new UniTagger(this);
 		
 		cb = new JComboBox(taggerlist);
 		cb.setSize(150,25);
@@ -125,12 +130,19 @@ public class TaggerGUI implements ActionListener{
 		log = new JTextArea();
 		log.setSize(756,390);
 		log.setLocation(20,150);
+		log.setEditable(false);
 		log.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		log.setBackground(new Color(0x404040));
 		log.setForeground(new Color(0xFFFFFF));
+		
+		// add a scrollbar to the log
+		scroll = new JScrollPane (log);
+		scroll.setBounds(20, 150, 756, 390);
+		scroll.setSize(756,390);
+		scroll.setLocation(20,150);
 		//this.addlogmore("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
 		
-		// define & config our Menubuttons (Train, Tag, Save, Run)
+		// define & config our Menubuttons (Train, Tag, Export, Run)
 		train_btn = new JButton("Train");
 		train_btn.setSize(80,25);
 		train_btn.setLocation(330,115);
@@ -141,7 +153,7 @@ public class TaggerGUI implements ActionListener{
 		tag_btn.setLocation(420,115);
 		tag_btn.addActionListener(this);
 		
-		save_btn = new JButton("Save");
+		save_btn = new JButton("Export");
 		save_btn.setSize(80,25);
 		save_btn.setLocation(510,115);
 		save_btn.addActionListener(this);
@@ -167,8 +179,8 @@ public class TaggerGUI implements ActionListener{
 		f.add(label_tr);
 		f.add(label_tg);
 		f.add(label_ex);
-		f.add(log);
-		
+		//f.add(log);
+		f.add(scroll);
 		// force swing into the nulllayoutmanager
 		f.setLayout(null);
 	}
@@ -325,6 +337,11 @@ public class TaggerGUI implements ActionListener{
 	
 	public void addlogln(String s){
 		log.append(prefix+s+"\n");
+		
+		// set the Scrollbar to bottom
+		scroll.getVerticalScrollBar().setValue( scroll.getVerticalScrollBar().getMaximum() );
+
+
 	}
 	
 	

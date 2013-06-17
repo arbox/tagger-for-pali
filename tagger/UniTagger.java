@@ -17,20 +17,30 @@ public class UniTagger implements Tagger {
 	private Map<String, HashMap<String, Integer>> wtfreq;
 	private Map<String, Integer> tagmap;
 	private Set<String> sents;
+	private TaggerGUI gui;
+	
+	public UniTagger(TaggerGUI gui){
+		this.gui = gui;
+		init();
+	}
 	public UniTagger(){
+		init();
 		
+		train("pali-goldstandard1.csv");
+		
+		printMap(wtfreq);
+		
+		tag("pali-goldstandard2.csv");
+	}
+	
+	private void init(){
 		wtfreq = new HashMap<String, HashMap<String,Integer>>();
 		sents  = new HashSet<String>();
-		//train("pali-goldstandard1.csv");
-		
-		//printMap(wtfreq);
-		
-		//tag("pali-goldstandard2.csv");
-		
 	}
 	@Override
 	public void train(String fileName) {
 		System.out.println("Start training...");
+		guiprintln("Start training...");
 		try {
 			File f = new File(fileName);
 			/* Hat noch ein Problem da jegliche Umwandelung (von byte zu  String in UTF-8/ISO./USASCII etc) dazu führen das manche Characters 
@@ -66,6 +76,7 @@ public class UniTagger implements Tagger {
 			System.out.println(e.getMessage());
 		}
 		System.out.println("Finished training!");
+		guiprintln("Finished training...");
 	}
 	private static void printMap(Map mp) {
 		Iterator it = mp.entrySet().iterator();
@@ -78,11 +89,13 @@ public class UniTagger implements Tagger {
 	@Override
 	public void tag(String fileName) {
 		System.out.println("Start tagging...");
+		guiprintln("Start tagging...");
 		//Lese die zu taggende Daten ein
 		tagRead(fileName);
 		//Tagge die Daten
 		tagSet();
 		System.out.println("Finished tagging!");
+		guiprintln("Finished tagging!");
 	}
 	
 	private void tagRead(String fileName){
@@ -148,13 +161,20 @@ public class UniTagger implements Tagger {
           //Gib getaggte Seq aus
           for(int i=0; i<tmp.length;i++){
         	  System.out.println(tmp[i]);
+        	  guiprintln(tmp[i]);
           }
         }
 	}
 	@Override
 	public void export(String fileName) {
-		// TODO Auto-generated method stub
 		
+		
+	}
+	
+	private void guiprintln(String s){
+		if(!(gui == null)){
+			gui.addlogln(s);
+		}
 	}
 	
 }
