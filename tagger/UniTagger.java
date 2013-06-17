@@ -14,25 +14,23 @@ public class UniTagger implements Tagger {
 	/**
 	 * @author BobP
 	 */
-	private String dis;
 	private Map<String, HashMap<String, Integer>> wtfreq;
 	private Map<String, Integer> tagmap;
 	private Set<String> sents;
 	public UniTagger(){
-		dis = "[UniTagger] # ";
 		
 		wtfreq = new HashMap<String, HashMap<String,Integer>>();
 		sents  = new HashSet<String>();
-		train("pali-goldstandard1.csv");
+		//train("pali-goldstandard1.csv");
 		
 		//printMap(wtfreq);
 		
-		tag("pali-goldstandard2.csv");
+		//tag("pali-goldstandard2.csv");
 		
 	}
 	@Override
 	public void train(String fileName) {
-		System.out.println(dis+"Start training...");
+		System.out.println("Start training...");
 		try {
 			File f = new File(fileName);
 			/* Hat noch ein Problem da jegliche Umwandelung (von byte zu  String in UTF-8/ISO./USASCII etc) dazu führen das manche Characters 
@@ -67,7 +65,7 @@ public class UniTagger implements Tagger {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-		System.out.println(dis+"Finished training!");
+		System.out.println("Finished training!");
 	}
 	private static void printMap(Map mp) {
 		Iterator it = mp.entrySet().iterator();
@@ -79,12 +77,12 @@ public class UniTagger implements Tagger {
 	}
 	@Override
 	public void tag(String fileName) {
-		System.out.println(dis+"Start tagging...");
+		System.out.println("Start tagging...");
 		//Lese die zu taggende Daten ein
 		tagRead(fileName);
 		//Tagge die Daten
 		tagSet();
-		System.out.println(dis+"Finished tagging!");
+		System.out.println("Finished tagging!");
 	}
 	
 	private void tagRead(String fileName){
@@ -152,6 +150,11 @@ public class UniTagger implements Tagger {
         	  System.out.println(tmp[i]);
           }
         }
+	}
+	@Override
+	public void export(String fileName) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
