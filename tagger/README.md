@@ -21,8 +21,8 @@ How to use
 		|
 		|--icon.png
 		|--gson-2.2.4.jar
-2.	>Switch into the tagger folder and run:
-	> ant
-	If it builds succesfully, it generates a directory called src.
+2.	- Switch into the tagger folder and run:
+	- ant
+	- If it builds succesfully, it generates a directory called src.
 3. To run the program, switch into the src directory and run:
 	> java Launcher
