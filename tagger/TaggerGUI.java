@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintStream;
 import java.util.StringTokenizer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -13,7 +12,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -29,7 +27,7 @@ public class TaggerGUI implements ActionListener{
 	private JFileChooser fc;
 	private JTextArea log;
 	private JScrollPane scroll;
-	private String prefix;
+	private String prefix, sep;
 	private String[] taggerlist;
 	private Tagger[] taggers;
 	
@@ -37,7 +35,6 @@ public class TaggerGUI implements ActionListener{
 		Config();
 		
 		f.setVisible(true);
-		
 	}
 	
 	
@@ -52,7 +49,14 @@ public class TaggerGUI implements ActionListener{
 		fc = new JFileChooser(System.getProperty("user.dir"));
 		taggerlist = new String[2];
 		taggers   = new Tagger[2];
+		
 		prefix = " [Unigram Tagger] - ";
+		sep = "";  // v--Switches the seperator used between directories in addresses dependend on the OS
+		if(System.getProperty("os.name").toLowerCase().indexOf("win")>=0){
+			sep = "\\";  //Windows
+		}else{
+			sep = "/";   //Unix
+		}
 		
 		// config the Frame itself
 		f.setIconImage(new ImageIcon("data/icon.png").getImage()); 
@@ -60,7 +64,7 @@ public class TaggerGUI implements ActionListener{
 		f.setDefaultCloseOperation(f.EXIT_ON_CLOSE);
 		f.setTitle("ElePali-Tagger");
 		f.setResizable(false);
-		f.setSize(800,600);
+		f.setSize(800,400);
 		f.setLocation(100,100);
 		
 		// add, define & config the Menubar
@@ -98,17 +102,17 @@ public class TaggerGUI implements ActionListener{
 		filetoTrain_jtf = new JTextField(200);
 		filetoTrain_jtf.setSize(510,25);
 		filetoTrain_jtf.setLocation(110,10);
-		filetoTrain_jtf.setText(System.getProperty("user.dir")+"\\pali-goldstandard1.csv");
+		filetoTrain_jtf.setText(System.getProperty("user.dir")+sep+"pali-goldstandard1.csv");
 		
 		filetoTag_jtf = new JTextField(200);
 		filetoTag_jtf.setSize(510,25);
 		filetoTag_jtf.setLocation(110,45);
-		filetoTag_jtf.setText(System.getProperty("user.dir")+"\\pali-goldstandard2.csv");
+		filetoTag_jtf.setText(System.getProperty("user.dir")+sep+"pali-goldstandard2.csv");
 		
 		filetoOP_jtf = new JTextField(200);
 		filetoOP_jtf.setSize(510,25);
 		filetoOP_jtf.setLocation(110,80);
-		filetoOP_jtf.setText(System.getProperty("user.dir")+"\\output.csv");
+		filetoOP_jtf.setText(System.getProperty("user.dir")+sep+"output.csv");
 		
 		// define & config buttons
 		openTrain_btn = new JButton("Choose...");
@@ -128,7 +132,7 @@ public class TaggerGUI implements ActionListener{
 		
 		// define & config the log
 		log = new JTextArea();
-		log.setSize(756,390);
+		log.setSize(756,190);
 		log.setLocation(20,150);
 		log.setEditable(false);
 		log.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -138,9 +142,8 @@ public class TaggerGUI implements ActionListener{
 		// add a scrollbar to the log
 		scroll = new JScrollPane (log);
 		scroll.setBounds(20, 150, 756, 390);
-		scroll.setSize(756,390);
+		scroll.setSize(756,190);
 		scroll.setLocation(20,150);
-		//this.addlogmore("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
 		
 		// define & config our Menubuttons (Train, Tag, Export, Run)
 		train_btn = new JButton("Train");
@@ -320,8 +323,8 @@ public class TaggerGUI implements ActionListener{
 		f.getContentPane();
 	}
 	/**
-	 * Adds the String s to leg and also newlinefeeds after roughly 110 chars
-	 * @param s String which gets added to the log
+	 * Adds the String s to the log and also newlinefeeds after roughly 110 chars
+	 * @param s String added to the log
 	 */
 	public void addlogmore(String s){
 		String toAdd = "";
@@ -335,6 +338,10 @@ public class TaggerGUI implements ActionListener{
 		}
 	}
 	
+	/**
+	 * Adds the String s to the log with a newlinefeed afterwards
+	 * @param s String added to the log
+	 */
 	public void addlogln(String s){
 		log.append(prefix+s+"\n");
 		
