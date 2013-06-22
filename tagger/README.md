@@ -12,12 +12,15 @@ How to build & run
 ~~~~
     /tagger
     |
+    |---Exporter.java
     |---Launcher.java
+    |---PyExe.java
     |---Tagger.java
     |---TaggerGUI.java
     |---UniTagger.java
     |---build.xml
     |---README.md
+    |---.gitignore
     |---/data
         |
         |---icon.png
