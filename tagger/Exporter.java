@@ -6,9 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 
 public class Exporter {
 	/**
@@ -51,26 +48,22 @@ public class Exporter {
             }
 		}
 	}
-	/**
-	 * creates a json file with the data provided by the map data
-	 * @param fileName name of the created file
-	 * @param data data printed into the json file
-	 */
-	public void exportJSON(String fileName,Map<String, String> data){
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		 
-		// convert java object to JSON format, and returned as JSON formatted string
-		String json = gson.toJson(data);
-	 
-		File f = new File(fileName+".json");
+	
+	public void exportCSV(String fileName, String[][] data){
+		File f;
 		BufferedWriter w = null;
-		try {
-			
-			f.createNewFile();
-			w = new BufferedWriter(new FileWriter(fileName+".json"));
-			w.write(json);
 		
-		} catch (IOException e) {
+		f=new File(fileName+".csv");
+		try{
+			f.createNewFile();
+			w = new BufferedWriter(new FileWriter(fileName+".csv"));
+			
+			for(int i=0;i<data.length;i++){
+				if(data[i][0]!=null){
+					w.write(data[i][0]+ "	" +data[i][1]+"\n");
+				}
+			}
+		} catch(IOException e){
 			System.out.println("ERROR cant find/open the file "+fileName);
 		} finally {
 			try {
