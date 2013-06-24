@@ -18,6 +18,7 @@ How to build & run
     |---Tagger.java
     |---TaggerGUI.java
     |---UniTagger.java
+    |---TrigramTagger.java
     |---build.xml
     |---README.md
     |---.gitignore
