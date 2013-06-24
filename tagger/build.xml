@@ -4,15 +4,11 @@
 	<property name="src.dir" value="."/>
 	<property name="build.dir" value="src"/>
 	
-	<path id="PaliTagger.classpath">
-        	<pathelement location="data/gson-2.2.4.jar"/>
-    	</path>
-	
 	<target name="build">
 		<mkdir dir="${build.dir}"/>
+		<mkdir dir="output"/>
 		<javac destdir="${build.dir}" source="1.7" target="1.7">
-            		<src path="${src.dir}"/>
-			<classpath refid="PaliTagger.classpath"/>
-       		</javac>
+            <src path="${src.dir}"/>
+       	</javac>
 	</target>
 </project>
