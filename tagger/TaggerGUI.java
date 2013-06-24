@@ -22,8 +22,7 @@ public class TaggerGUI implements ActionListener{
 	private JFrame f;
 	private JTextField filetoTag_jtf, filetoTrain_jtf, filetoOP_jtf;
 	private JButton openTrain_btn, openTag_btn, openOP_btn, train_btn, tag_btn, save_btn, run_btn ;
-	@SuppressWarnings("rawtypes")
-	private JComboBox cb;
+	private JComboBox<String> cb;
 	private JFileChooser fc;
 	private JTextArea log;
 	private JScrollPane scroll;
@@ -42,7 +41,6 @@ public class TaggerGUI implements ActionListener{
 	 * Configurates the frame, its Components, adds them to the Frame itself
 	 * and initalizes used Objects
 	 */
-	@SuppressWarnings({ "static-access", "unchecked", "rawtypes" })
 	private void Config() {
 		// initialize the used objects
 		f  = new JFrame();
@@ -61,7 +59,7 @@ public class TaggerGUI implements ActionListener{
 		// config the Frame itself
 		f.setIconImage(new ImageIcon("data/icon.png").getImage()); 
 		// ^--the img in icon.png is created by myself so its free to use
-		f.setDefaultCloseOperation(f.EXIT_ON_CLOSE);
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setTitle("ElePali-Tagger");
 		f.setResizable(false);
 		f.setSize(800,400);
@@ -72,12 +70,12 @@ public class TaggerGUI implements ActionListener{
 		
 		// define & config the combobox
 		taggerlist[0] = "Unigram Tagger";
-		taggerlist[1] = "Bigram Tagger";
+		taggerlist[1] = "HMM Trigram Tagger";
 		
 		taggers[0] = new UniTagger(this);
-		taggers[1] = new UniTagger(this);
+		taggers[1] = new TrigramTagger(this);
 		
-		cb = new JComboBox(taggerlist);
+		cb = new JComboBox<String>(taggerlist);
 		cb.setSize(150,25);
 		cb.setLocation(110,115);
 		
