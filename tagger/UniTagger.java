@@ -4,11 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 
 public class UniTagger implements Tagger {
@@ -16,43 +14,46 @@ public class UniTagger implements Tagger {
 	 * @author BobP
 	 */
 	private Map<String, HashMap<String, Integer>> wtfreq;
-	private Map<String, Integer> tagmap;
-	private Map<String, String> taggeddata;
-	private Set<String> sents;
+	private String[][] sentences;
 	private TaggerGUI gui;
 	private Exporter ep;
 	
+	/**
+	 * constructor called by the gui to print the progress
+	 * @param gui reference to the gui
+	 */
 	public UniTagger(TaggerGUI gui){
 		this.gui = gui;
-		
 		init();
 	}
+	
 	public UniTagger(){
 		init();
 		
 		train("pali-goldstandard1.csv");
 		
-		//printMap(wtfreq);
-		
 		tag("pali-goldstandard2.csv");
 	}
 	
+	/**
+	 * initalizes the objects used by the tagger
+	 */
 	private void init(){
 		wtfreq = new HashMap<String, HashMap<String,Integer>>();
-		sents  = new HashSet<String>();
-		
-		taggeddata = new HashMap<String,String>();
+		sentences = new String[500][2];
 		ep = new Exporter();
 	}
+	
+	/**
+	 * reads a file and takes it as base to learn the tagger
+	 * @param fieName file to learn from
+	 */
 	@Override
 	public void train(String fileName) {
-		System.out.println("Start training...");
-		guiprintln("Start training...");
+		gprintln("Start training...");
 		try {
 			File f = new File(fileName);
-			/* Hat noch ein Problem da jegliche Umwandelung (von byte zu  String in UTF-8/ISO./USASCII etc) dazu führen das manche Characters 
-			 * zu ? werden, dieses Verhalten trat bisher nur mit den goldstandard.csv-Daten auf
-			 * */
+			// reads Data in UTF-8
 			BufferedReader in = new BufferedReader(	new InputStreamReader( new FileInputStream(f),"UTF-8"));
 	 
 			String str;
@@ -80,117 +81,152 @@ public class UniTagger implements Tagger {
 			}
 			in.close();
 		} catch (IOException e) {
-			System.out.println("ERROR cant find/open the file "+fileName);
-			guiprintln("ERROR cant find/open the file "+fileName);
-			guiprintln("Abort training!");
+			gprintln("ERROR cant find/open the file "+fileName);
+			gprintln("Abort training!");
 			return;
 		}
-		System.out.println("Finished training!");
-		guiprintln("Finished training...");
-	}
-	private void printMap(Map<String,String> mp) {
-		Iterator<Entry<String, String>> it = mp.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String,String> pairs = (Map.Entry<String,String>)it.next();
-			System.out.println(pairs.getKey() + " = " + pairs.getValue());
-			guiprintln(pairs.getKey() + " = " + pairs.getValue());
-		}
-	}
-	@Override
-	public void tag(String fileName) {
-		System.out.println("Start tagging...");
-		guiprintln("Start tagging...");
-		//Lese die zu taggende Daten ein
-		int ret = tagRead(fileName);
-		if(ret == 1){
-			//Tagge die Daten
-			tagSet();
-			System.out.println("Finished tagging!");
-			guiprintln("Finished tagging!");
-		}
+		gprintln("Finished training!");
 	}
 	
+	/**
+	 * tags the data in the file fileName
+	 * @param fieName file to be tagged
+	 */
+	@Override
+	public void tag(String fileName){
+		gprintln("Start tagging...");
+		
+		int ret = tagRead(fileName);
+		if(ret == 1){
+			//reading in the data to tag was successful, so set the tag
+			tagSet();
+		}else{
+			//error, can just be occur due to ioexception
+			gprintln("ERROR cant find/open the file "+fileName);
+			gprintln("Abort tagging!");
+			return;
+		}
+		gprintln("Finished tagging!");
+	}
+	
+	/**
+	 * reads the data to tag in
+	 * @param fileName file to be tagged
+	 * @return integervalue which determines if the function was successful(1) or not(0)
+	 */
 	private int tagRead(String fileName){
+		int pos = 0;
+		gprintln("war in tagRead");
 		File f = new File(fileName);
 		BufferedReader in;
 		try {
 			in = new BufferedReader(new InputStreamReader( new FileInputStream(f), "UTF-8"));
-			String str;
+			String line;
 			String[] tmp;
-			String sen = "";
-			while ((str = in.readLine()) != null) {
-				tmp=str.split("	");
-				if(tmp[0].equals("text")){
-					//Entferne alle mehrfachen Spaces
-					sen = sen.replaceAll(" +", " ");
-					//Merke den Satz
-					sents.add(sen);
-					//Reset um den naechsten zu lesen
-					sen = "";
-				}else{
-					//Nehme Satzzeichen nicht mit in den Satz auf
-					if(!(tmp[0].equals(" ") || tmp[0].equals(".")|| tmp[0].equals("!")|| tmp[0].equals("?")|| tmp[0].equals(",")|| tmp[0].equals("?"))){
-						//Baue den Satz zusammen, Wort fuer Wort
-						sen  = sen +"  "+ tmp[0];
-					}
+			while ((line = in.readLine()) != null) {
+				tmp=line.split("	");
+				for(int i=0;i<tmp.length;i++){
+					addTokenToTag(tmp[0], pos);
 				}
+				pos++;
 			}
 			in.close();
-		} catch (IOException e) {
-			System.out.println("ERROR cant find/open the file "+fileName);
-			guiprintln("ERROR cant find/open the file "+fileName);
-			guiprintln("Abort tagging!");
-			return 0;
-		}
+		} catch (IOException e) {return 0;}
 		return 1;
 	}
 	
-	private void tagSet() {
-		Iterator<String> it=sents.iterator();
-		while(it.hasNext()){
-          String value=(String)it.next();
-          String[] tmp;
-          tmp=value.split(" ");
-          //Iteriere ueber jedes Wort im Satz und gib dem Wort falls bekannt das haeufigste gesehene Tag
-          for(int i=0; i<tmp.length;i++){
-				if(wtfreq.containsKey(tmp[i])){
-					//Suche haeufigstes Tag (provisorisch)
-					tagmap = wtfreq.get(tmp[i]);
-					int step_i = 0, maxcount=0;
-					String maxtag = "";
-					Iterator<Entry<String, Integer>> it2 = tagmap.entrySet().iterator();
-					while (it2.hasNext()) {
-						Map.Entry<String,Integer> pairs = (Map.Entry<String,Integer>)it2.next();
-						if(step_i == 0) {
-							maxtag = (String) pairs.getKey();
-							maxcount = (int) pairs.getValue();
-						}else{
-							if(((int)pairs.getValue())>maxcount){
-								maxtag = (String) pairs.getKey();
-								maxcount = (int) pairs.getValue();
-							}
-						}
-					}
-					//Setze Tag
-					//tmp[i] = tmp[i]+" --- "+maxtag;
-					taggeddata.put(tmp[i],maxtag);
-				}
-		  }
-          //Gib getaggte Seq aus
-          printMap(taggeddata);
-        }
-	}
-	@Override
-	public void export(String fileName) {
-		fileName = fileName.substring(0,fileName.indexOf("."));
-		ep.exportCSV(fileName, taggeddata);
-		guiprintln("File "+fileName+".csv has been created!");
+	/**
+	 * tags the data read by tagRead
+	 */
+	private void tagSet(){
+		gprintln("war in tagSet");
+		for(int i=0;i<sentences.length;i++){
+			if(sentences[i][0]!=null){
+				sentences[i][1] = getMaxTag(sentences[i][0]);
+			}
+		}
+		printStrAr(sentences);
 	}
 	
-	private void guiprintln(String s){
+	
+	@Override
+	public void export(String fileName) {
+		fileName = fileName.substring(0,fileName.indexOf(".csv"));
+		ep.exportCSV(fileName, sentences);
+		gprintln("File "+fileName+".csv has been created!");
+	}
+	
+	
+	/**
+	 * looks up the tag for the token "token" passed as arg with the most occurrences
+	 * @param token token from which we search the most common tag
+	 */
+	private String getMaxTag(String token){
+		String maxtag = ""; int maxcount = 0;
+		boolean at_begin = true;
+		
+		//atleast sth in our database?
+		if(wtfreq.containsKey(token)){
+			//search for the tag with the most occurrences
+			Iterator<Entry<String, Integer>> i = wtfreq.get(token).entrySet().iterator();
+			while(i.hasNext()){
+				Map.Entry<String, Integer> pairs = (Map.Entry<String,Integer>)i.next();
+				if(!at_begin){
+					if((int)pairs.getValue()>maxcount){
+						maxtag = (String) pairs.getKey();
+						maxcount = (int) pairs.getValue();
+					}
+				}else{
+					maxtag = (String) pairs.getKey();
+					maxcount = (int) pairs.getValue();
+				}
+					
+			}
+		}else{
+			//nothing in our database
+			return "NoTagFound";
+		}
+		return maxtag;
+	}
+	
+	/**
+	 * prints the output to the gui if initalized and also into the consoles
+	 * @param s
+	 */
+	private void gprintln(String s){
 		if(!(gui == null)){
-			gui.addlogln(s);
+			gui.println(s);
+		}
+		System.out.println(s);
+	}
+	
+	/**
+	 * stubfunction to show the output of a stringarray
+	 * @param s
+	 */
+	private void printStrAr(String[][] s){
+		for(int i=0;i<s.length;i++){
+			if(s[i][0]!=null){
+				gprintln(s[i][0] +"="+s[i][1]);
+			}
 		}
 	}
 	
+	/**
+	 * adds a token to the global array sentences and prevents the case that the array is too small
+	 * by doubling its size in such a case
+	 * @param token token to be written into the array
+	 * @param pos position at which the token should land
+	 */
+	private void addTokenToTag(String token, int pos){
+		if(pos > (sentences.length-1)){
+			String[][] tmp = (String[][])sentences.clone();
+			sentences = new String[sentences.length*2][2];
+			
+			for(int i=0;i<tmp.length;i++){
+				sentences[i][0] = tmp[i][0];
+			}
+		}
+		sentences[pos][0] = token;
+	}
 }
