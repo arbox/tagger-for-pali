@@ -57,7 +57,7 @@ public class TaggerGUI implements ActionListener{
 		}
 		
 		// config the Frame itself
-		f.setIconImage(new ImageIcon("data/icon.png").getImage()); 
+		f.setIconImage(new ImageIcon("../data/icon.png").getImage()); 
 		// ^--the img in icon.png is created by myself so its free to use
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setTitle("ElePali-Tagger");
@@ -110,7 +110,7 @@ public class TaggerGUI implements ActionListener{
 		filetoOP_jtf = new JTextField(200);
 		filetoOP_jtf.setSize(510,25);
 		filetoOP_jtf.setLocation(110,80);
-		filetoOP_jtf.setText(System.getProperty("user.dir")+sep+"output.csv");
+		filetoOP_jtf.setText(System.getProperty("user.dir")+sep+".."+sep+"output"+sep+"output.csv");
 		
 		// define & config buttons
 		openTrain_btn = new JButton("Choose...");
@@ -340,13 +340,14 @@ public class TaggerGUI implements ActionListener{
 	 * Adds the String s to the log with a newlinefeed afterwards
 	 * @param s String added to the log
 	 */
-	public void addlogln(String s){
-		log.append(prefix+s+"\n");
+	public void println(String s){
+		if(s!=null){
+			log.append(prefix+s+"\n");
+			
+			// set the Scrollbar to bottom
+			scroll.getVerticalScrollBar().setValue( scroll.getVerticalScrollBar().getMaximum() );
 		
-		// set the Scrollbar to bottom
-		scroll.getVerticalScrollBar().setValue( scroll.getVerticalScrollBar().getMaximum() );
-
-
+		}
 	}
 	
 	
