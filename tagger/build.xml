@@ -2,13 +2,22 @@
 
 <project basedir="." default="build" name="PaliTagger">
 	<property name="src.dir" value="."/>
-	<property name="build.dir" value="src"/>
-	
+	<property name="build.dir" value="build"/>
+
 	<target name="build">
 		<mkdir dir="${build.dir}"/>
-		<mkdir dir="output"/>
-		<javac destdir="${build.dir}" source="1.7" target="1.7">
-            <src path="${src.dir}"/>
-       	</javac>
+		<mkdir dir="${build.dir}/classes"/>
+		<javac destdir="${build.dir}/classes" source="1.7" target="1.7">
+			<src path="${src.dir}"/>
+		</javac>
+	</target>
+	<target name="package">
+		<jar destfile="${build.dir}/tagger.jar"
+		basedir="${build.dir}/classes">
+			<manifest>
+				<attribute name="Main-Class"
+					   value="Launcher"/>
+			</manifest>
+		</jar>
 	</target>
 </project>
