@@ -19,7 +19,7 @@ public class Exporter {
 	 * @param fileName name of the created File
 	 * @param data data printed into the csv File
 	 */
-	public void exportCSV(String fileName,Map<String, String> data){
+	public int exportCSV(String fileName,Map<String, String> data){
 		File f;
 		BufferedWriter w = null;
 		
@@ -37,26 +37,29 @@ public class Exporter {
 		    
 		} catch (IOException e) {
 			System.out.println("ERROR cant find/open the file "+fileName);
+			return -1;
 		} finally {
 			try {
                 if (w != null) {
                     w.flush();
                     w.close();
                 }
+                
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
 		}
+		return 0;
 	}
 	
-	public void exportCSV(String fileName, String[][] data){
+	public int exportCSV(String fileName, String[][] data){
 		File f;
 		BufferedWriter w = null;
 		
 		f=new File(fileName+".csv");
 		try{
 			f.createNewFile();
-			w = new BufferedWriter(new FileWriter(fileName+".csv"));
+			w = new BufferedWriter(new FileWriter("output.csv"));
 			
 			for(int i=0;i<data.length;i++){
 				if(data[i][0]!=null){
@@ -65,6 +68,7 @@ public class Exporter {
 			}
 		} catch(IOException e){
 			System.out.println("ERROR cant find/open the file "+fileName);
+			return -1;
 		} finally {
 			try {
                 if (w != null) {
@@ -75,5 +79,6 @@ public class Exporter {
                 ex.printStackTrace();
             }
 		}
+		return 0;
 	}
 }
