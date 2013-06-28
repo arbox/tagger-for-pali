@@ -17,6 +17,7 @@ public class UniTagger implements Tagger {
 	private String[][] sentences;
 	private TaggerGUI gui;
 	private Exporter ep;
+	private Integer rows;
 	
 	/**
 	 * constructor called by the gui to print the progress
@@ -116,7 +117,6 @@ public class UniTagger implements Tagger {
 	 */
 	private int tagRead(String fileName){
 		int pos = 0;
-		gprintln("war in tagRead");
 		File f = new File(fileName);
 		BufferedReader in;
 		try {
@@ -139,7 +139,6 @@ public class UniTagger implements Tagger {
 	 * tags the data read by tagRead
 	 */
 	private void tagSet(){
-		gprintln("war in tagSet");
 		for(int i=0;i<sentences.length;i++){
 			if(sentences[i][0]!=null){
 				sentences[i][1] = getMaxTag(sentences[i][0]);
