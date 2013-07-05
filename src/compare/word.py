@@ -7,8 +7,8 @@ class Word:
         def add(self, tagCombination):
                 self.tagCombinations.append(tagCombination)
 
-        #search the needle (TagCombination) in the haystack (TagCombinations of
-        #current word)
+        #search the needle (TagCombination) in the haystack = 
+        #(TagCombinations of current word)
         def hasTagCombination(self, needle):
                 found = False
                 for tagCombination in self.tagCombinations:

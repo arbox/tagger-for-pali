@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-
 public class TaggerGUI implements ActionListener{
 	
 	private JFrame f;
@@ -26,7 +25,7 @@ public class TaggerGUI implements ActionListener{
 	private JFileChooser fc;
 	private JTextArea log;
 	private JScrollPane scroll;
-	private String prefix, sep;
+	private String sep;
 	private String[] taggerlist;
 	private Tagger[] taggers;
 	
@@ -48,7 +47,6 @@ public class TaggerGUI implements ActionListener{
 		taggerlist = new String[2];
 		taggers   = new Tagger[2];
 		
-		prefix = " [Unigram Tagger] - ";
 		sep = "";  // v--Switches the seperator used between directories in addresses dependend on the OS
 		if(System.getProperty("os.name").toLowerCase().indexOf("win")>=0){
 			sep = "\\";  //Windows
@@ -57,7 +55,7 @@ public class TaggerGUI implements ActionListener{
 		}
 		
 		// config the Frame itself
-		f.setIconImage(new ImageIcon("../data/icon.png").getImage()); 
+		f.setIconImage(new ImageIcon("../data/icon.png").getImage());
 		// ^--the img in icon.png is created by myself so its free to use
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setTitle("ElePali-Tagger");
@@ -72,6 +70,7 @@ public class TaggerGUI implements ActionListener{
 		taggerlist[0] = "Unigram Tagger";
 		taggerlist[1] = "HMM Trigram Tagger";
 		
+		//taggers[0] = new UniTagger(this);
 		taggers[0] = new UniTagger(this);
 		taggers[1] = new TrigramTagger(this);
 		
@@ -330,7 +329,7 @@ public class TaggerGUI implements ActionListener{
 		while(st.hasMoreTokens()){
 			toAdd = toAdd + " " + st.nextToken();
 			if((toAdd.length())>110){
-				log.append(prefix+toAdd+"\n");
+				log.append(toAdd+"\n");
 				toAdd = "";
 			}
 		}
@@ -342,7 +341,7 @@ public class TaggerGUI implements ActionListener{
 	 */
 	public void println(String s){
 		if(s!=null){
-			log.append(prefix+s+"\n");
+			log.append(s+"\n");
 			
 			// set the Scrollbar to bottom
 			scroll.getVerticalScrollBar().setValue( scroll.getVerticalScrollBar().getMaximum() );
