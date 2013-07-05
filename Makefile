@@ -1,17 +1,31 @@
 ANT := ant
+MAKE := make
 
-SRC_DIR 	:= "src/"
-TAGGER_DIR 	:= "tagger/"
-COMPARE_DIR := "compare/"
+BASE_DIR        := $(abspath .)
+
+BIN_DIR         := $(addprefix $(BASE_DIR)/, bin)
+SRC_DIR         := $(addprefix $(BASE_DIR)/, src)
+TAGGER_DIR      := $(addprefix $(SRC_DIR)/, tagger)
+COMPARE_DIR     := $(addprefix $(SRC_DIR)/, compare)
 
 .DEFAULT:
-	make-all
+	$(MAKE) all
+all:
+	$(MAKE) clean
+	$(MAKE) prepare
+	$(MAKE) tagger
+	$(MAKE) compare
 
+prepare:
+	mkdir -p $(BIN_DIR)
+	
+tagger:
+	$(ANT) -f $(TAGGER_DIR)/build.xml
+	cp $(TAGGER_DIR)/build/tagger.jar $(BIN_DIR)/tagger.jar
 
-make-all:
-	make-tagger
-	make-compare
-
-make-tagger:
-	cd $(SRC_DIR)$(TAGGER_DIR)
-	ant build.xml
+compare:
+	echo "To be implemented"
+        
+clean:
+	$(ANT) -f $(TAGGER_DIR)/build.xml clean
+	rm -Rf $(BIN_DIR)
