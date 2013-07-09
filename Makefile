@@ -29,3 +29,4 @@ compare:
 clean:
 	$(ANT) -f $(TAGGER_DIR)/build.xml clean
 	rm -Rf $(BIN_DIR)
+
