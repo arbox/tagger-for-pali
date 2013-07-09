@@ -1,4 +1,4 @@
-tagger-for-pali
+splitcorpus
 ===============
 
-This is the main repository containing our work on the Pali Tagger during the summer term 2013.
+This tool devides a chosen corpus into a training corpus and a test corpus.
