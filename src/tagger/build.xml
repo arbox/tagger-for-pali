@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<project basedir="." default="build" name="PaliTagger">
+	<property name="src.dir" value="."/>
+	<property name="build.dir" value="src"/>
+	
+	<target name="build">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="output"/>
+		<javac destdir="${build.dir}" source="1.7" target="1.7">
+            <src path="${src.dir}"/>
+       	</javac>
+	</target>
+</project>
