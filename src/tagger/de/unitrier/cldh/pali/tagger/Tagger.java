@@ -1,3 +1,4 @@
+package de.unitrier.cldh.pali.tagger;
 
 public interface Tagger{
 	public void train(String fileName);

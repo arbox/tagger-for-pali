@@ -1,3 +1,5 @@
+package de.unitrier.cldh.pali.tagger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +9,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import de.unitrier.cldh.pali.core.Exporter;
+import de.unitrier.cldh.pali.core.TaggerGUI;
 
 
 public class UniTagger implements Tagger {
@@ -30,10 +35,6 @@ public class UniTagger implements Tagger {
 	
 	public UniTagger(){
 		init();
-		
-		train("pali-goldstandard1.csv");
-		
-		tag("pali-goldstandard2.csv");
 	}
 	
 	/**
@@ -51,7 +52,7 @@ public class UniTagger implements Tagger {
 	 */
 	@Override
 	public void train(String fileName) {
-		gprintln("Start training...");
+		gprintln("Start training with the file "+fileName);
 		try {
 			File f = new File(fileName);
 			// reads Data in UTF-8
@@ -95,7 +96,7 @@ public class UniTagger implements Tagger {
 	 */
 	@Override
 	public void tag(String fileName){
-		gprintln("Start tagging...");
+		gprintln("Start tagging the file "+fileName);
 		
 		int ret = tagRead(fileName);
 		if(ret == 1){
@@ -140,7 +141,8 @@ public class UniTagger implements Tagger {
 	 */
 	private void tagSet(){
 		for(int i=0;i<sentences.length;i++){
-			if(sentences[i][0]!=null){
+			if(sentences[i][0]!=null && !sentences[i][0].equals("")){
+				
 				sentences[i][1] = getMaxTag(sentences[i][0]);
 			}
 		}
