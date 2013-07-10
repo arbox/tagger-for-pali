@@ -1,95 +1,73 @@
 ﻿#NOTE: Input file must contain an empty line at the end. All ouput files contain one, too.
-
-#--initial stuff (importing, opening files)
 import random
-import codecs #open files in UTF-8
-import sys
-from optparse import OptionParser #command line options
-f_test = codecs.open("test.txt","w", "utf-8")
-f_train = codecs.open("train.txt","w", "utf-8")
+import os
+import os.path
+import argparse
 
+def generateSplit(corpus, test_size):
+	allSentences = list()
+	testSentences = list()
+	sentence = list()
+	
+	#satzweise einlesen
+	for line in corpus:
+		if line != os.linesep: #zeile enthält buchstaben --> wie werden satzgrenzen aussehen?
+			sentence.append(line)
+		else:
+			sentence.append(line)
+			allSentences.append(sentence)
+			sentence = list()
+			
+	sentence.append(os.linesep)
+	allSentences.append(sentence)
+	
+	print("Corpus length: %d sentences" % len(allSentences))
+	
+	#size for test corpus
+	testSize = (float(test_size) / 100.0) * float(len(allSentences)) #not optimal since sentences vary in length
+	testSize = int(round(testSize))
 
-def writeFiles(corpus_filename, test_size,):
-	#reads corpus file (user choice) into an array
-	c_open = codecs.open(corpus_filename, "r", "utf-8")
-	allLines = c_open.readlines()
-	c_open.close()
+	#--create test corpus from random sentences
+	random.seed()
+	for i in range(testSize):
+		rdNum = random.randint(0, len(allSentences) - 1) #pick number between 1 and number of sentences in corpus
+		testSentences.append(allSentences.pop(rdNum))
 
-        #number of lines needed in test corpus: useless since it's the sentences that are important?!
-        #c_length = len(codecs.open(corpus_filename, "r", "utf-8").readlines())
-        #testLines = (test_size / 100.0) * float(c_length)
+	print("Corpus successfully split into train and test corpora.")
+	
+	return (testSentences, allSentences)
 
-        #satzweise einlesen
-        sentence = []
-        allSentences = []
+def writeSentences(sentences, outfile):
+		#Write first sentence without seperator
+		del sentences[-1][-1]
+			
+		for sentence in sentences[1:]:
+			for elem in sentence:
+				outfile.write(elem)
 
-        for i in allLines:
-                if i != '\r\n': #zeile enthält buchstaben --> wie werden satzgrenzen aussehen?
-                        sentence.append(i)
-                        #print("neu: " + str(sentence))
-                else:
-                        sentence.append(i) #leerzeile mit rein
-                        allSentences.append(sentence)
-                        sentence = []
-                        #print("satz neu: " + str(allSentences))
+def main():
+	#commandlineoptions
+	parser = argparse.ArgumentParser(description='Splits a corpus into a test and a training corpus')
+	parser.add_argument("infile", metavar="FILE", help="The corpus you want to split", nargs=1, type=str)
+	parser.add_argument("-p", "--test-corpus-size",  metavar="NUMBER", default=10, type=int, help="Desired size of test corpus in per cent (default: 10)")
+	parser.add_argument("-o", "--outdir",  metavar="DIR", default=".", type=str, help="Output directory for the test and the training corpus")
+	parser.add_argument("--test-name",  metavar="FILE", default="test.csv", type=str, help="Name of the file for the test corpus (default: test.csv")
+	parser.add_argument("--train-name",  metavar="FILE", default="train.csv", type=str, help="Name of the file for the training corpus (default: train.csv")
 
-        print(len(allSentences))
-        print(" ")
+	args = parser.parse_args()
+	
+	testCorpus = list()
+	trainCorpus = list()
 
-        #size for test corpus
-        testSize = (float(test_size) / 100.0) * float(len(allSentences)) #not optimal since sentences vary in length
-        #--trainLines must be int --> gets rounded
-        testSize2INT = int(testSize)
-        testSizeRound = 0
-        if (testSize < (float(testSize2INT) + 0.5)):
-                testSizeRound = testSize2INT
-                print("Abgerundeter Input:" + str(testSizeRound)) #debug; number of sentences in future test corpus
-        elif (testSize > testSize2INT):
-           testSizeRound = testSize2INT+1
-           print("Aufgerundeter Input:" + str(testSizeRound)) #debug; number of sentences in future test corpus
+	with open(args.infile[0], "r", encoding="utf-8") as corpus:
+		(testCorpus, trainCorpus) = generateSplit(corpus, args.test_corpus_size)
+		
+	with open(os.path.join(args.outdir, args.test_name),"w", encoding="utf-8") as test:
+		writeSentences(testCorpus, test)
+		
+	with open(os.path.join(args.outdir, args.train_name),"w", encoding="utf-8") as train:
+		writeSentences(trainCorpus, train)
+		
 
-
-        #--create test corpus in a random loop
-        rdCounter = testSizeRound
-        random.seed() #initialize random function
-        while rdCounter != 0:
-                rdNum = random.randint(0, len(allSentences) - 1) #pick number between 1 and number of sentences in corpus
-                transport = allSentences[rdNum]
-                allSentences.pop(rdNum)
-                print("random#: " + str(rdNum) + ", Element: " + str(transport)) #debug
-                #transport wieder in Zeilen wandeln
-                for elem in transport:
-                        f_test.write(str(elem))
-                rdCounter = rdCounter - 1
-        print(str(allSentences))
-        #--create train corpus from remaining elements in allLines
-        while len(allSentences) != 0:
-                transport = allSentences.pop()
-                print("Transport-Item: " + str(transport)) #debug
-                #transport wieder in Zeilen wandeln
-                for elem in transport:
-                        f_test.write(str(elem))
-
-        print("Corpus successfully split into train and test corpora.")
-        f_train.close()
-        f_test.close()
-
-#commandlineoptions
-parser = OptionParser()
-parser.add_option("-c", "--corpus", dest="c", metavar="FILE",
-                  help="choose a corpus you want to split")
-parser.add_option("-p", "--test-corpus-size", dest="p", metavar="NUMBER",
-                  help="desired size of test corpus in per cent")
-
-(options, args) = parser.parse_args()
-
-if not options.c or not options.p:
-        parser.print_help()
-        sys.exit(0)
-        pass
-
-corpus_filename = options.c
-test_size = options.p
-
-
-writeFiles(corpus_filename, test_size)
+if __name__ == "__main__":
+	main()
