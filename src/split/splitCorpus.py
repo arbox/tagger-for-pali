@@ -12,11 +12,11 @@ def generateSplit(corpus, test_size):
 	#satzweise einlesen
 	for line in corpus:
 		sentence.append(line)
-		if line == os.linesep: #zeile enthält buchstaben
+		if line == '\n': #zeile enthält buchstaben
 			allSentences.append(sentence)
 			sentence = list()
 			
-	sentence.append(os.linesep)
+	sentence.append('\n')
 	allSentences.append(sentence)
 	
 	print("Corpus length: %d sentences" % len(allSentences))
