@@ -11,7 +11,7 @@ def generateSplit(corpus, test_size):
 	
 	#satzweise einlesen
 	for line in corpus:
-		if line != os.linesep: #zeile enthält buchstaben --> wie werden satzgrenzen aussehen?
+		if line != os.linesep: #zeile enthält buchstaben
 			sentence.append(line)
 		else:
 			sentence.append(line)
@@ -27,10 +27,10 @@ def generateSplit(corpus, test_size):
 	testSize = (float(test_size) / 100.0) * float(len(allSentences)) #not optimal since sentences vary in length
 	testSize = int(round(testSize))
 
-	#--create test corpus from random sentences
+	#create test corpus from random sentences
 	random.seed()
 	for i in range(testSize):
-		rdNum = random.randint(0, len(allSentences) - 1) #pick number between 1 and number of sentences in corpus
+		rdNum = random.randint(0, len(allSentences) - 1) #pick number between 0 and number of sentences in corpus
 		testSentences.append(allSentences.pop(rdNum))
 
 	print("Corpus successfully split into train and test corpora.")
@@ -38,7 +38,7 @@ def generateSplit(corpus, test_size):
 	return (testSentences, allSentences)
 
 def writeSentences(sentences, outfile):
-		#Write first sentence without seperator
+		#Delete the double newline at the end of the file
 		del sentences[-1][-1]
 			
 		for sentence in sentences[1:]:
