@@ -1,3 +1,4 @@
+package de.unitrier.cldh.pali.core;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,7 +16,7 @@ public class PyExe {
 	 * @return returns a bufferedreader to read the output
 	 */
 	public BufferedReader  execute(String fileName, String[] args){
-		// set up the command and parameter
+		// setup the command and parameter
 		String pythonScriptPath = fileName;
 		String[] cmd = new String[2+args.length];
 		cmd[0] = "python";
@@ -32,7 +33,7 @@ public class PyExe {
 		try {
 			pr = rt.exec(cmd);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Couldnt find "+pythonScriptPath);
 		}
 		 
 		// return output from python script

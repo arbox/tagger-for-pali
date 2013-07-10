@@ -1,3 +1,4 @@
+package de.unitrier.cldh.pali.core;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,7 +33,11 @@ public class Exporter {
 			Iterator<Entry<String, String>> it = data.entrySet().iterator();
 		    while (it.hasNext()) {
 				Map.Entry<String,String> pairs = (Map.Entry<String,String>)it.next();
-		        w.write(pairs.getKey() + "	" + pairs.getValue()+"\n");
+				if(pairs.getValue()!=null) {
+					w.write(pairs.getKey() + "	" + pairs.getValue()+"\n");
+		        }else{
+		        	w.write(pairs.getKey());
+		        }
 		    }
 		    
 		} catch (IOException e) {
@@ -63,7 +68,13 @@ public class Exporter {
 			
 			for(int i=0;i<data.length;i++){
 				if(data[i][0]!=null){
-					w.write(data[i][0]+ "	" +data[i][1]+"\n");
+					if(data[i][1]!=null){
+						w.write(data[i][0]+ "	" +data[i][1]+"\n");
+					}else{
+						w.write(data[i][0]+"\n");
+					}
+				}else{
+					w.write("\n");
 				}
 			}
 		} catch(IOException e){

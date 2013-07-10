@@ -1,3 +1,6 @@
+package de.unitrier.cldh.pali.tagger;
+
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +11,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import de.unitrier.cldh.pali.core.Exporter;
+import de.unitrier.cldh.pali.core.TaggerGUI;
 
 
 
@@ -20,6 +26,10 @@ public class TrigramTagger implements Tagger {
 	
 	public TrigramTagger(TaggerGUI taggerGUI) {
 		this.gui = taggerGUI;
+		init();
+	}
+	
+	public TrigramTagger() {
 		init();
 	}
 	
@@ -246,17 +256,19 @@ public class TrigramTagger implements Tagger {
 				for(int i=1; i<tmp.length;i++){
 					tmp[0] = tmp[0].toLowerCase();
 					addtag(k,0,tmp[0]);
-					addtag(k,1,tmp[1]);
+					//addtag(k,1,tmp[1]);
 				}
 				k++;
 			}
 			in.close();
+			
 			
 			// clean our tag_data-array(delete nullslots)
 			String[][] swap = new String[k][2];
 			System.arraycopy(tag_data, 0, swap, 0, k);
 			tag_data = new String[k][2];
 			System.arraycopy(swap, 0, tag_data, 0, k);
+			
 			
 		} catch (IOException e) {
 			gprintln("ERROR cant find/open the file "+fileName);
@@ -269,23 +281,17 @@ public class TrigramTagger implements Tagger {
 	 * defines the borders of our sentences and tags them with the help of tagSentence
 	 */
 	private void tagSet(){
-		int sent_begin = 0, sent_end = 0;
-		
+		int sent_begin = 0;
 		int i;
 		for(i=0;i<tag_data.length;i++){
-			if(tag_data[i][0]== null || tag_data[i][0].equals("null")){
-				tag_data[i][0] = "";
-			}
-			if(tag_data[i][1]!=null && tag_data[i][1].equals("part of speech")){
-				sent_end = i-1; //cause i is currently at part of speech, so i-1 is at a "." (point)
-				//everything we need to know, now lets tag our sentence
-				tagSentence(sent_begin, sent_end);
-				//cause 1 line text, 1 line null & afterwards the start
-				sent_begin = sent_end +3; 
+			if(tag_data[i][0] == null || tag_data[i][0].equals("")){
+				
+				tagSentence(sent_begin,(i-1));
+				sent_begin = i+1;
+				
 			}
 		}
-		sent_end = i-1;
-		tagSentence(sent_begin,sent_end);
+		tagSentence(sent_begin,(i-1));
 	}
 
 	/**
@@ -296,10 +302,9 @@ public class TrigramTagger implements Tagger {
 	private void tagSentence(int from, int to){
 		//split the sentence into trigrams and tag them
 		int i;
-		double max_poss = 0, poss =0, q, e;
-		boolean begin = true;
+		double max_poss = 0, q, e;
+		//Holds the actually seen tags
 		String[] tag_poss = new String[3];
-		String[] tag_maxp = new String[3];
 		Iterator<String> it_0, it_1, it_2;
 		
 		//Iterate through the sentence
@@ -325,9 +330,12 @@ public class TrigramTagger implements Tagger {
 									//if its more likely change the tags
 									if(e*q>max_poss){
 										max_poss = e*q;
-										tag_data[i][1]   = tag_maxp[0];
-										tag_data[i+1][1] = tag_maxp[1];
-										tag_data[i+2][1] = tag_maxp[2];
+										//System.out.println(max_poss);
+										
+										tag_data[i][1]   = tag_poss[0];
+										tag_data[i+1][1] = tag_poss[1];
+										tag_data[i+2][1] = tag_poss[2];
+										
 									}
 								}
 							}
@@ -354,28 +362,29 @@ public class TrigramTagger implements Tagger {
 		
 		//iterate over every token of our sentence
 		for(int i=from;i<=to;i++){
-			
-			
-			//look if its not tagged
-			if(tag_data[i][1]==null){ tag_data[i][1]=""; }
-			
-			if(tag_data[i][1].equals("null") || tag_data[i][1].equals("")){
-				//not tagged so just look up the most seen tag or it, and set it to that
+			int mostSeenN = 0;
+			if(tag_data[i][0]!=null && tag_data[i][1]==null){
 				it = poss_tags.iterator();
-				timesSeen = 0;
 				while(it.hasNext()){
 					//sadly need to test with every existing tag since our datastructure isnt formed that efficient
 					currentPossTag = it.next();
+					//token-tag-combination exists in our datastruc?
 					if(token_tag_count.containsKey(tag_data[i][0]+"_"+currentPossTag)){
-						//test if this token tag combination is more likely then the one we found earlier
-						if(token_tag_count.get(tag_data[i][0]+"_"+currentPossTag)>timesSeen){
-							timesSeen   = token_tag_count.get(tag_data[i][0]+"_"+currentPossTag);
+						//is the token-tag-count higher?
+						if(token_tag_count.get(tag_data[i][0]+"_"+currentPossTag)>mostSeenN){
+							mostSeenN=token_tag_count.get(tag_data[i][0]+"_"+currentPossTag);
 							mostSeenTag = currentPossTag;
 						}
 					}
 				}
-				tag_data[i][1] = mostSeenTag;
+				//sth found?
+				if(mostSeenN>0){
+					tag_data[i][1] = mostSeenTag;
+				}else{
+					tag_data[i][1] = "NoTagFound";
+				}
 			}
+			
 		}
 	}
 	
