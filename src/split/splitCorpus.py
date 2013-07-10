@@ -11,10 +11,8 @@ def generateSplit(corpus, test_size):
 	
 	#satzweise einlesen
 	for line in corpus:
-		if line != os.linesep: #zeile enthält buchstaben
-			sentence.append(line)
-		else:
-			sentence.append(line)
+		sentence.append(line)
+		if line == os.linesep: #zeile enthält buchstaben
 			allSentences.append(sentence)
 			sentence = list()
 			
