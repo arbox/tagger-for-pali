@@ -1,6 +1,5 @@
 package de.unitrier.cldh.pali.core;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -45,6 +44,10 @@ public class Launcher {
 				chosenTagger = chosenTagger.toLowerCase();
 				if(chosenTagger.equals("unigram") || chosenTagger.equals("trigram")){
 					if(cmd.hasOption("r")){
+						//set called python to a different one, checks if correct in PyExe itself
+						if(cmd.hasOption("p")){
+							pyexe.setDiffVer(cmd.getOptionValue('p'));
+						}
 						String relPath = cmd.getOptionValue('r');
 						//check atleast if the chosen path ends with .csv
 						if(relPath.endsWith(".csv")){
@@ -58,6 +61,7 @@ public class Launcher {
 								//create train,test.csv with splitCorpus.py
 								String[] args1 = new String[1];
 								args1[0]=relPath;
+								
 								pyexe.execute("splitCorpus.py", args1);
 								//wait half a second, tests showed sometimes java wants to read faster 
 								//then os/python could create the files
@@ -66,6 +70,7 @@ public class Launcher {
 								t.train("train.csv");
 								t.tag("test.csv");
 								t.export("output.csv");
+								t.evaluate();
 							}else{
 								System.out.println("> Trigramtagger");
 								//it must be trigram
@@ -82,6 +87,7 @@ public class Launcher {
 								t.train("train.csv");
 								t.tag("test.csv");
 								t.export("output.csv");
+								t.evaluate();
 							}
 						}
 					}else{
@@ -96,9 +102,10 @@ public class Launcher {
 		}
 		
 		} catch (ParseException | InterruptedException e) {
-			System.out.println("Usage: <jarName> [-t TAGGER] [-r RESOURCE]");
+			System.out.println("Usage: <jarName> [-t TAGGER] [-r RESOURCE] [-p PYVERSION<optional>]		OR		<jarName> [-gui]");
 			System.out.println("\n[-t] - tagger taken for the POS-process\n>	valid values: \"unigram\" or \"trigram\"");
 			System.out.println("\n[-r] - path to the resource to be tagged\n>	remark: has to be a csv-file & is relative to the jar directory");
+			System.out.println("\n[-p] - to call another pythonversion\n>	valid values : \"python\" or \"python3\"");
 			//e.printStackTrace();
 		}
 	}

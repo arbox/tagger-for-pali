@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import de.unitrier.cldh.pali.core.Evaluator;
 import de.unitrier.cldh.pali.core.Exporter;
 import de.unitrier.cldh.pali.core.TaggerGUI;
 
@@ -20,23 +22,27 @@ import de.unitrier.cldh.pali.core.TaggerGUI;
 public class TrigramTagger implements Tagger {
 	private TaggerGUI gui;
 	private String[][] train_data, tag_data;
+	private Map<String, HashMap<String, Integer>> wtfreq;
 	private Map<String,Integer> unitag_count, bitag_count, tritag_count, token_tag_count;
 	private Set<String> poss_tags;
 	private Exporter ep;
+	private Integer rows;
+	private boolean trainsucc;
 	
 	public TrigramTagger(TaggerGUI taggerGUI) {
 		this.gui = taggerGUI;
-		init();
 	}
 	
 	public TrigramTagger() {
-		init();
 	}
 	
 	/**
 	 * initalizes the objects used by the tagger
 	 */
 	private void init(){
+		trainsucc = false;
+		wtfreq = new HashMap<String, HashMap<String,Integer>>();
+		
 		ep = new Exporter();
 		train_data	= new String[500][2];
 		tag_data	= new String[500][2];
@@ -60,29 +66,60 @@ public class TrigramTagger implements Tagger {
 		poss_tags.add("quotation participle");poss_tags.add("relative personal pronoun");poss_tags.add("relative pronoun");poss_tags.add("verb");
 	}
 	
+	/**
+	 * trains our tagger with the inputdata fileName
+	 */
 	@Override
 	public void train(String fileName) {
+		//reset our datastrucs
+		init();
 		gprintln("Start training...");
 		trainRead(fileName);
 		trainLookUpValues();
 		gprintln("Finished training!");
-	}
-	@Override
-	public void tag(String fileName) {
-		tagRead(fileName);
-		tagSet();
+		trainsucc=true;
 	}
 	
+	/**
+	 * tags the data provided by fileName with the knowledge learned in the trainmethod
+	 */
+	@Override
+	public void tag(String fileName) {
+		gprintln("Start tagging...");
+		//is our tagger trained?
+		if(trainsucc){
+			//read the data to tag
+			tagRead(fileName);
+			
+			//tag the read data
+			tagSet();
+			gprintln("Finished tagging!");
+		}else{
+			gprintln("ERROR couldnt tag, tagger must be trained first");
+		}
+	}
+	
+	/**
+	 * exports the data into fileName.csv
+	 */
 	@Override
 	public void export(String fileName) {
 		fileName = fileName.substring(0,fileName.indexOf(".csv"));
-		int ret = ep.exportCSV(fileName, tag_data);
+		int ret = ep.exportCSV(fileName, tag_data, rows);
 		if(ret > -1){
 			gprintln("File "+fileName+".csv has been created!");
 		}else{
-			gprintln("Error couldnt find the directory to save in!");
+			gprintln("ERROR couldnt create the File "+fileName);
 		}
 		
+	}
+	
+	/**
+	 * evalutaes the our tagger and prints it out
+	 */
+	@Override
+	public void evaluate() {
+		new Evaluator("test.csv","output.csv",gui);
 	}
 	
 	/**
@@ -97,7 +134,7 @@ public class TrigramTagger implements Tagger {
 			
 			String str;
 			String[] tmp;
-			int k = 0;
+			int k = 0, tagfreq;
 			// iterate through the document and save every line in train_data
 			while ((str = in.readLine()) != null) {
 				tmp=str.split("	");
@@ -105,6 +142,22 @@ public class TrigramTagger implements Tagger {
 					tmp[0] = tmp[0].toLowerCase();
 					addtrain(k,0,tmp[0]);
 					addtrain(k,1,tmp[1]);
+					
+					//-----WordTagFrequency
+					if(!wtfreq.containsKey(tmp[0])){
+						wtfreq.put(tmp[0], new HashMap<String, Integer>());
+					}else{
+						if(wtfreq.get(tmp[0]).containsKey(tmp[i])){
+									
+							tagfreq = wtfreq.get(tmp[0]).get(tmp[i]);
+							wtfreq.get(tmp[0]).remove(tmp[i]);
+							tagfreq++;
+							wtfreq.get(tmp [0]).put(tmp[i], tagfreq);
+	
+						}else{
+							wtfreq.get(tmp[0]).put(tmp[i],1);
+						}
+					}
 				}
 				k++;
 			}
@@ -115,6 +168,7 @@ public class TrigramTagger implements Tagger {
 			System.arraycopy(train_data, 0, swap, 0, k);
 			train_data = new String[k][2];
 			System.arraycopy(swap, 0, train_data, 0, k);
+			rows = k;
 			
 		} catch (IOException e) {
 			gprintln("ERROR cant find/open the file "+fileName);
@@ -183,6 +237,7 @@ public class TrigramTagger implements Tagger {
 				}else{
 					token_tag_count.put(tmp, 1);
 				}
+				
 			}
 		}
 	}
@@ -254,7 +309,7 @@ public class TrigramTagger implements Tagger {
 			while ((str = in.readLine()) != null) {
 				tmp=str.split("	");
 				for(int i=1; i<tmp.length;i++){
-					tmp[0] = tmp[0].toLowerCase();
+					//tmp[0] = tmp[0].toLowerCase();
 					addtag(k,0,tmp[0]);
 					//addtag(k,1,tmp[1]);
 				}
@@ -314,23 +369,25 @@ public class TrigramTagger implements Tagger {
 			//every possible token_tag combination with every other possible token_tag combination
 			while(it_0.hasNext()){
 				tag_poss[0] = it_0.next();
-				if(token_tag_count.containsKey(tag_data[i][0]+"_"+tag_poss[0])){
+				if(token_tag_count.containsKey(tag_data[i][0].toLowerCase()+"_"+tag_poss[0])){
 					it_1 = poss_tags.iterator();
 					while(it_1.hasNext()){
 						tag_poss[1] = it_1.next();
-						if(token_tag_count.containsKey(tag_data[i+1][0]+"_"+tag_poss[1])){
+						if(token_tag_count.containsKey(tag_data[i+1][0].toLowerCase()+"_"+tag_poss[1])){
 							it_2 = poss_tags.iterator();
 							while(it_2.hasNext()){
 								tag_poss[2] = it_2.next();
-								if(token_tag_count.containsKey(tag_data[i+2][0]+"_"+tag_poss[2])){
+								if(token_tag_count.containsKey(tag_data[i+2][0].toLowerCase()+"_"+tag_poss[2])){
 				
 									//calc our possibility
-									e = (e(tag_data[i][0],tag_poss[0]) * e(tag_data[i+1][0],tag_poss[1]) * e(tag_data[i+2][0],tag_poss[2]));
+									e = (	e(tag_data[i][0].toLowerCase(),tag_poss[0]) 	* 
+											e(tag_data[i+1][0].toLowerCase(),tag_poss[1]) 	* 
+											e(tag_data[i+2][0].toLowerCase(),tag_poss[2])	);
+									
 									q = q(tag_poss[0],tag_poss[1],tag_poss[2]);
 									//if its more likely change the tags
 									if(e*q>max_poss){
 										max_poss = e*q;
-										//System.out.println(max_poss);
 										
 										tag_data[i][1]   = tag_poss[0];
 										tag_data[i+1][1] = tag_poss[1];
@@ -356,35 +413,21 @@ public class TrigramTagger implements Tagger {
 	 * @param to end of our sentence
 	 */
 	private void tagNotTaggedWithMostSeen(int from, int to){
-		Iterator<String> it;
-		String mostSeenTag = "", currentPossTag = "";
-		Integer timesSeen = 0;
+		String token = "";
 		
 		//iterate over every token of our sentence
 		for(int i=from;i<=to;i++){
-			int mostSeenN = 0;
-			if(tag_data[i][0]!=null && tag_data[i][1]==null){
-				it = poss_tags.iterator();
-				while(it.hasNext()){
-					//sadly need to test with every existing tag since our datastructure isnt formed that efficient
-					currentPossTag = it.next();
-					//token-tag-combination exists in our datastruc?
-					if(token_tag_count.containsKey(tag_data[i][0]+"_"+currentPossTag)){
-						//is the token-tag-count higher?
-						if(token_tag_count.get(tag_data[i][0]+"_"+currentPossTag)>mostSeenN){
-							mostSeenN=token_tag_count.get(tag_data[i][0]+"_"+currentPossTag);
-							mostSeenTag = currentPossTag;
-						}
-					}
-				}
-				//sth found?
-				if(mostSeenN>0){
-					tag_data[i][1] = mostSeenTag;
+			//sth to tag in col 0?
+			if(tag_data[i][0]!=null){
+				token = tag_data[i][0].toLowerCase();
+				//nothing tagged in col 1?
+				if(tag_data[i][1]==null || tag_data[i][1].equals("")){
+					tag_data[i][1] = getMaxTag(token);
 				}else{
-					tag_data[i][1] = "NoTagFound";
+					//for debug
+					//tag_data[i][1] = tag_data[i][1]+"<<<TRITAGGED";
 				}
 			}
-			
 		}
 	}
 	
@@ -482,6 +525,34 @@ public class TrigramTagger implements Tagger {
 			//add our value we couldnt add
 			addtrain(i,j,value);
 			System.err.println("note - had to double array size (from "+tmp.length+" to "+tag_data.length+")");
+		}
+	}
+	
+	/**
+	 * looks up the tag for the token "token" passed as arg with the most occurrences
+	 * @param token token from which we search the most common tag
+	 */
+	private String getMaxTag(String token){
+		String maxtag = ""; int maxcount = 0;
+		
+		//atleast sth in our database?
+		if(wtfreq.containsKey(token)){
+			//search for the tag with the most occurrences
+			Iterator<Entry<String, Integer>> i = wtfreq.get(token).entrySet().iterator();
+			while(i.hasNext()){
+				Map.Entry<String, Integer> pairs = (Map.Entry<String,Integer>)i.next();
+				if(pairs.getValue()>maxcount){
+					maxtag = (String) pairs.getKey();
+					maxcount = (int) pairs.getValue();
+				}
+					
+			}
+		}
+		if(maxcount>0){
+			return maxtag;
+		}else{	
+			//nothing in our database
+			return "NoTagFound";
 		}
 	}
 }

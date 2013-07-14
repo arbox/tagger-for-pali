@@ -57,16 +57,21 @@ public class Exporter {
 		return 0;
 	}
 	
-	public int exportCSV(String fileName, String[][] data){
+	public int exportCSV(String fileName, String[][] data, int linesToExport){
 		File f;
 		BufferedWriter w = null;
-		
 		f=new File(fileName+".csv");
+		int minrows = 0;
+		if(data.length<linesToExport){
+			minrows = data.length;
+		}else{
+			minrows = linesToExport;
+		}
 		try{
 			f.createNewFile();
 			w = new BufferedWriter(new FileWriter("output.csv"));
 			
-			for(int i=0;i<data.length;i++){
+			for(int i=0;i<minrows;i++){
 				if(data[i][0]!=null){
 					if(data[i][1]!=null){
 						w.write(data[i][0]+ "	" +data[i][1]+"\n");

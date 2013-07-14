@@ -6,4 +6,6 @@ public interface Tagger{
 	public void tag(String fileName);
 	
 	public void export(String fileName);
+	
+	public void evaluate();
 }

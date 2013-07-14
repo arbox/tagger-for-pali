@@ -25,8 +25,8 @@ import de.unitrier.cldh.pali.tagger.UniTagger;
 public class TaggerGUI implements ActionListener{
 	
 	private JFrame f;
-	private JTextField input_jtf, output_jtf, filetoOP_jtf;
-	private JButton openTrain_btn, openTag_btn, openOP_btn, train_btn, tag_btn, save_btn, run_btn ;
+	private JTextField second_jtf, first_jtf, filetoOP_jtf;
+	private JButton openTrain_btn, openTag_btn, openOP_btn, train_btn, tag_btn, save_btn, eval_btn, run_btn ;
 	private JComboBox<String> cb;
 	private JFileChooser fc;
 	private JTextArea log;
@@ -84,6 +84,7 @@ public class TaggerGUI implements ActionListener{
 		cb = new JComboBox<String>(taggerlist);
 		cb.setSize(150,25);
 		cb.setLocation(110,80);
+		cb.setSelectedIndex(1);
 		
 		// define & config labels
 		JLabel label_cb = new JLabel("Used Tagger");
@@ -103,15 +104,15 @@ public class TaggerGUI implements ActionListener{
 		label_ex.setLocation(20,80);
 		
 		// define & config inputfields
-		output_jtf = new JTextField(200);
-		output_jtf.setSize(510,25);
-		output_jtf.setLocation(110,10);
-		output_jtf.setText(System.getProperty("user.dir")+sep+"input.csv");
+		first_jtf = new JTextField(200);
+		first_jtf.setSize(510,25);
+		first_jtf.setLocation(110,10);
+		first_jtf.setText(System.getProperty("user.dir")+sep+"inputwos.csv");
 		
-		input_jtf = new JTextField(200);
-		input_jtf.setSize(510,25);
-		input_jtf.setLocation(110,45);
-		input_jtf.setText(System.getProperty("user.dir")+sep+"output.csv");
+		second_jtf = new JTextField(200);
+		second_jtf.setSize(510,25);
+		second_jtf.setLocation(110,45);
+		second_jtf.setText(System.getProperty("user.dir")+sep+"output.csv");
 		
 		filetoOP_jtf = new JTextField(200);
 		filetoOP_jtf.setSize(510,25);
@@ -151,28 +152,33 @@ public class TaggerGUI implements ActionListener{
 		
 		// define & config our Menubuttons (Train, Tag, Export, Run)
 		train_btn = new JButton("Train");
-		train_btn.setSize(80,25);
-		train_btn.setLocation(330,80);//115
+		train_btn.setSize(70,25);
+		train_btn.setLocation(280,80);//115
 		train_btn.addActionListener(this);
 		
 		tag_btn = new JButton("Tag");
-		tag_btn.setSize(80,25);
-		tag_btn.setLocation(420,80);
+		tag_btn.setSize(70,25);
+		tag_btn.setLocation(360,80);
 		tag_btn.addActionListener(this);
 		
 		save_btn = new JButton("Export");
 		save_btn.setSize(80,25);
-		save_btn.setLocation(510,80);
+		save_btn.setLocation(440,80);
 		save_btn.addActionListener(this);
 		
+		eval_btn = new JButton("Evaluate");
+		eval_btn.setSize(80,25);
+		eval_btn.setLocation(530,80);
+		eval_btn.addActionListener(this);
+		
 		run_btn = new JButton("Run");
-		run_btn.setSize(180,25);
-		run_btn.setLocation(600,80);
+		run_btn.setSize(160,25);
+		run_btn.setLocation(620,80);
 		run_btn.addActionListener(this);
 		
 		// add the components to the frame
-		f.add(output_jtf);
-		f.add(input_jtf);
+		f.add(first_jtf);
+		f.add(second_jtf);
 		//f.add(filetoOP_jtf);
 		f.add(openTrain_btn);
 		f.add(openTag_btn);
@@ -180,6 +186,7 @@ public class TaggerGUI implements ActionListener{
 		f.add(train_btn);
 		f.add(tag_btn);
 		f.add(save_btn);
+		f.add(eval_btn);
 		f.add(run_btn);
 		f.add(cb);
 		f.add(label_cb);
@@ -216,6 +223,10 @@ public class TaggerGUI implements ActionListener{
 			taggers[cb.getSelectedIndex()].export("output.csv");
 		}
 		
+		if(e.getSource() == eval_btn){
+			taggers[cb.getSelectedIndex()].evaluate();
+		}
+		
 		if(e.getSource() == run_btn){
 			//create train,test.csv with splitCorpus.py
 			splitCorp();
@@ -223,6 +234,7 @@ public class TaggerGUI implements ActionListener{
 			taggers[cb.getSelectedIndex()].train("train.csv");
 			taggers[cb.getSelectedIndex()].tag("test.csv");
 			taggers[cb.getSelectedIndex()].export("output.csv");
+			taggers[cb.getSelectedIndex()].evaluate();
 		}
 		
 		if(e.getSource() == openTrain_btn){
@@ -230,7 +242,7 @@ public class TaggerGUI implements ActionListener{
 	        int ret = fc.showOpenDialog(null);
 	        // proofs if open was choosed
 	        if(ret == JFileChooser.APPROVE_OPTION){
-	        	output_jtf.setText(fc.getSelectedFile().getAbsolutePath());
+	        	first_jtf.setText(fc.getSelectedFile().getAbsolutePath());
 	        }
 		}
 		
@@ -239,7 +251,7 @@ public class TaggerGUI implements ActionListener{
 	        int ret = fc.showOpenDialog(null);
 	        // proofs if open was choosed
 	        if(ret == JFileChooser.APPROVE_OPTION){
-	        	input_jtf.setText(fc.getSelectedFile().getAbsolutePath());
+	        	second_jtf.setText(fc.getSelectedFile().getAbsolutePath());
 	        }
 		}
 		
@@ -284,7 +296,7 @@ public class TaggerGUI implements ActionListener{
 			        int ret = fc.showOpenDialog(null);
 			        // proofs if open was choosed
 			        if(ret == JFileChooser.APPROVE_OPTION){
-			        	output_jtf.setText(fc.getSelectedFile().getAbsolutePath());
+			        	first_jtf.setText(fc.getSelectedFile().getAbsolutePath());
 			        }
 					
 				}
@@ -299,7 +311,7 @@ public class TaggerGUI implements ActionListener{
 			        int ret = fc.showOpenDialog(null);
 			        // proofs if open was choosed
 			        if(ret == JFileChooser.APPROVE_OPTION){
-			        	input_jtf.setText(fc.getSelectedFile().getAbsolutePath());
+			        	second_jtf.setText(fc.getSelectedFile().getAbsolutePath());
 			        }
 				}
 				
@@ -354,7 +366,7 @@ public class TaggerGUI implements ActionListener{
 	private void splitCorp() throws InterruptedException{
 		//create train,test.csv with splitCorpus.py
 		String[] args = new String[1];
-		args[0]="input.csv";
+		args[0]=first_jtf.getText();
 		pyexe.execute("splitCorpus.py", args);
 		//wait half a second, tests showed sometimes java wants to read faster 
 		//then os/python could create the files

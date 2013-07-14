@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.unitrier.cldh.pali.core.Evaluator;
 import de.unitrier.cldh.pali.core.Exporter;
 import de.unitrier.cldh.pali.core.TaggerGUI;
 
@@ -30,11 +31,9 @@ public class UniTagger implements Tagger {
 	 */
 	public UniTagger(TaggerGUI gui){
 		this.gui = gui;
-		init();
 	}
 	
 	public UniTagger(){
-		init();
 	}
 	
 	/**
@@ -52,6 +51,8 @@ public class UniTagger implements Tagger {
 	 */
 	@Override
 	public void train(String fileName) {
+		//reset
+		init();
 		gprintln("Start training with the file "+fileName);
 		try {
 			File f = new File(fileName);
@@ -112,6 +113,27 @@ public class UniTagger implements Tagger {
 	}
 	
 	/**
+	 * exports the data into fileName.csv
+	 */
+	@Override
+	public void export(String fileName) {
+		fileName = fileName.substring(0,fileName.indexOf(".csv"));
+		int ret = ep.exportCSV(fileName, sentences, rows);
+		if(ret==0){
+			gprintln("File "+fileName+".csv has been created!");
+		}else{
+			gprintln("ERROR couldnt create the File "+fileName);
+		}
+	}
+	
+	/**
+	 * evalutaes the our tagger and prints it out
+	 */
+	@Override
+	public void evaluate() {
+		new Evaluator("test.csv","output.csv",gui);
+	}
+	/**
 	 * reads the data to tag in
 	 * @param fileName file to be tagged
 	 * @return integervalue which determines if the function was successful(1) or not(0)
@@ -131,6 +153,7 @@ public class UniTagger implements Tagger {
 				}
 				pos++;
 			}
+			rows = pos;
 			in.close();
 		} catch (IOException e) {return 0;}
 		return 1;
@@ -147,14 +170,6 @@ public class UniTagger implements Tagger {
 			}
 		}
 		printStrAr(sentences);
-	}
-	
-	
-	@Override
-	public void export(String fileName) {
-		fileName = fileName.substring(0,fileName.indexOf(".csv"));
-		ep.exportCSV(fileName, sentences);
-		gprintln("File "+fileName+".csv has been created!");
 	}
 	
 	

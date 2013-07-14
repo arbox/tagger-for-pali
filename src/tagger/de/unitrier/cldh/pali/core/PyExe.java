@@ -5,8 +5,9 @@ import java.io.InputStreamReader;
 
 
 public class PyExe {
+	private String pycmd = "python";
+	
 	public PyExe(){
-		
 	}
 	
 	/**
@@ -19,7 +20,7 @@ public class PyExe {
 		// setup the command and parameter
 		String pythonScriptPath = fileName;
 		String[] cmd = new String[2+args.length];
-		cmd[0] = "python";
+		cmd[0] = pycmd;
 		cmd[1] = pythonScriptPath;
 		
 		// pass the arguments into the cmd to call the pythonscript
@@ -38,5 +39,15 @@ public class PyExe {
 		 
 		// return output from python script
 		return new BufferedReader(new InputStreamReader(pr.getInputStream()));
+	}
+	
+	/**
+	 * sets a different pythoncallcommand, useful for some unix dists who call by default python 2.7 and python 3.x by python3
+	 * @param nwcmd
+	 */
+	public void setDiffVer(String nwcmd){
+		if(nwcmd!=null && (nwcmd.equals("python") || nwcmd.equals("python3"))){
+			pycmd = nwcmd;
+		}
 	}
 }
