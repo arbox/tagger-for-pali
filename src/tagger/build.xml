@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<project basedir="." default="package" name="PaliTagger">
+		<property name="src.dir" value="."/>
+		<property name="classpath" value="data/commons-cli-1.2.jar" />
+		<property name="build.dir" value="build"/>
+		<property name="build.dir.classes" value="${build.dir}/classes"/>
+
+		<target name="clean">
+				<delete dir="${build.dir}"/>
+		</target>
+
+		<target name="prepare" depends="clean">
+				<mkdir dir="${build.dir}"/>
+				<mkdir dir="${build.dir.classes}"/>
+		</target>
+
+		<target name="build" depends="prepare">
+				<javac includeantruntime="false" destdir="${build.dir}/classes" source="1.7" target="1.7" classpath="${classpath}">
+						<classpath>
+								<pathelement path="${java.class.path}/"/>
+								<pathelement path="${classpath}"/>
+						</classpath>
+						<src path="${src.dir}"/>
+				</javac>
+		</target>
+
+		<target name="package" depends="build">
+				<jar destfile="${build.dir}/tagger.jar" basedir="${build.dir}/classes">
+						<manifest>
+								<attribute name="Main-Class" value="de.unitrier.cldh.pali.core.Launcher"/>
+						</manifest>
+						<zipgroupfileset dir="data" includes="**/*.jar" />
+				</jar>
+		</target>
+</project>
