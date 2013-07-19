@@ -12,16 +12,10 @@ public class Evaluator {
 	
 	private ArrayList<String> gsdata;
 	private ArrayList<String> tgdata;
-	private TaggerGUI gui;
 	
 	public Evaluator(String gstdFile, String taggedFile){
 		
 		//compare("test.csv","output.csv");
-		compare(gstdFile,taggedFile);
-	}
-	
-	public Evaluator(String gstdFile, String taggedFile, TaggerGUI taggerGUI){
-		this.gui = taggerGUI;
 		compare(gstdFile,taggedFile);
 	}
 	
@@ -38,6 +32,7 @@ public class Evaluator {
 		int lit = 0;		//linesInTotal
 		int lnt = 0;		//linesNotTagged
 		int lt = 0;			//linesTagged
+		int lie = 0;		//lineIsEmpty
 		
 		while(gi.hasNext() || ti.hasNext()){
 			gnext = gi.next();
@@ -50,8 +45,15 @@ public class Evaluator {
 					lnt++;
 				}
 			}
+			if(gnext.equals("")){
+				lie++;
+			}
 			lit++;
 		}
+		//substract the count of empty lines off the stats
+		le  = le -lie;		
+		lit = lit - lie;
+		
 		lt = lit - lnt;
 		float precision = ((float)le/(float)lt);
 		float recall    = ((float)le/(float)lit);
@@ -61,16 +63,17 @@ public class Evaluator {
 		gprintln("\nLines not tagged:"+String.format("%11s","")+"["+String.format("%3d",lnt)+"/"+String.format("%3d",lit)+"]");
 		gprintln("Lines tagged:"+String.format("%15s","")+"["+String.format("%3d",lt)+"/"+String.format("%3d",lit)+"]");
 		gprintln("Lines correctly tagged:"+String.format("%5s","")+"["+String.format("%3d",le)+"/"+String.format("%3d",lt)+"]");
-		gprintln("Lines not correctly tagged: ["+String.format("%3d",lt-le)+"/"+lt+"]\n");
+		gprintln("Lines not correctly tagged: ["+String.format("%3d",lt-le)+"/"+String.format("%3d",lt)+"]\n");
 		
-		//how many lines got tagged right of the ones who got tagged 
-		gprintln("Precision = "+String.format("%.5f",precision));
 		//how many lines got tagged right of the whole data
-		gprintln("Recall    = "+String.format("%.5f",recall));
+		gprintln("Recall    = "+String.format("%.5f",recall)+""+String.format("%9s","")+"("+String.format("%3d",le)+"/"+String.format("%3d",lit)+")");
+		//how many lines got tagged right of the ones who got tagged 
+		gprintln("Precision = "+String.format("%.5f",precision)+""+String.format("%9s","")+"("+String.format("%3d",le)+"/"+String.format("%3d",lt)+")");
+		//how many lines failed to be tagged right
+		gprintln("Fallout   = "+String.format("%.5f",fallout)+""+String.format("%9s","")+"("+String.format("%3d",(lt-le))+"/"+String.format("%3d",lt)+")");
 		//harmonic mean of precision and recall
 		gprintln("F1measure = "+String.format("%.5f",f1meas));
-		//how many lines failed to be tagged right
-		gprintln("Fallout   = "+String.format("%.5f",fallout));
+		
 	}
 	
 	private ArrayList<String> readDataInList(String fileName){
@@ -101,9 +104,6 @@ public class Evaluator {
 	 * @param s
 	 */
 	private void gprintln(String s){
-		if(!(gui == null)){
-			gui.println(s);
-		}
 		System.out.println(s);
 	}
 }
