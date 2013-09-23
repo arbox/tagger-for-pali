@@ -1,4 +1,4 @@
-﻿#NOTE: Input file must contain an empty line at the end. All ouput files contain one, too.
+#!/usr/bin/env python3
 import random
 import os
 import os.path
@@ -8,19 +8,19 @@ def generateSplit(corpus, test_size):
 	allSentences = list()
 	testSentences = list()
 	sentence = list()
-	
+
 	#satzweise einlesen
 	for line in corpus:
 		sentence.append(line)
 		if line == '\n': #zeile enthält buchstaben
 			allSentences.append(sentence)
 			sentence = list()
-			
+
 	sentence.append('\n')
 	allSentences.append(sentence)
-	
+
 	print("Corpus length: %d sentences" % len(allSentences))
-	
+
 	#size for test corpus
 	testSize = (float(test_size) / 100.0) * float(len(allSentences)) #not optimal since sentences vary in length
 	testSize = int(round(testSize))
@@ -32,13 +32,13 @@ def generateSplit(corpus, test_size):
 		testSentences.append(allSentences.pop(rdNum))
 
 	print("Corpus successfully split into train and test corpora.")
-	
+
 	return (testSentences, allSentences)
 
 def writeSentences(sentences, outfile):
 		#Delete the double newline at the end of the file
 		del sentences[-1][-1]
-			
+
 		for sentence in sentences[1:]:
 			for elem in sentence:
 				outfile.write(elem)
@@ -53,19 +53,20 @@ def main():
 	parser.add_argument("--train-name",  metavar="FILE", default="train.csv", type=str, help="Name of the file for the training corpus (default: train.csv")
 
 	args = parser.parse_args()
-	
+
 	testCorpus = list()
 	trainCorpus = list()
 
 	with open(args.infile[0], "r", encoding="utf-8") as corpus:
 		(testCorpus, trainCorpus) = generateSplit(corpus, args.test_corpus_size)
-		
+
 	with open(os.path.join(args.outdir, args.test_name),"w", encoding="utf-8") as test:
 		writeSentences(testCorpus, test)
-		
+
 	with open(os.path.join(args.outdir, args.train_name),"w", encoding="utf-8") as train:
 		writeSentences(trainCorpus, train)
-		
+
 
 if __name__ == "__main__":
 	main()
+
