@@ -24,7 +24,7 @@ māṇavo	noun
 evaṃ	demonstrative_adverb
 me	pronoun
 sutaṃ	past_participle
-ekaṃ	cardinal_adjecitve
+ekaṃ	cardinal_adjective
 samayaṃ	noun
 bhagavā	noun
 nāḷandāyaṃ	proper_noun
