@@ -113,43 +113,43 @@ public class Launcher {
 					
 					rm.export("output.csv");
 					new Evaluator("test.csv","output.csv");
-				}else{
+				} else {
 					throw new ParseException("");
 				}
 				
-			}else{
-				if(cmd.hasOption("e") && cmd.hasOption("g") && cmd.hasOption("o") && 
+			} else {
+				if (cmd.hasOption("e") && cmd.hasOption("g") && cmd.hasOption("o") && 
 						cmd.getOptionValue("g").endsWith(".csv") && cmd.getOptionValue("o").endsWith(".csv")){
 					new Evaluator(cmd.getOptionValue("g"), cmd.getOptionValue("o"));
-				}else{
+				} else {
 					throw new ParseException("");
 				}
 			}
 		
 		
 		} catch (ParseException e) {
-			System.out.println("Caterpillar Version "+version+"\nUsage:\n"+String.format("%11s","")+"<jarName> [-tr arg] [-tg arg] [-s arg]");
+			System.out.println("Caterpillar Version " + version + "\nUsage:\n" + String.format("%11s","") + "<jarName> [-tr arg] [-tg arg] [-s arg]");
 			System.out.println(String.format("%10s","OR")+" <jarName> [-g arg] [-o arg] -e\n");
 			System.out.println("Caterpillar is a POS-Tagger for the Middle Indo-Aryan language Pali. It also contains an Evaluator");
 			System.out.println("to measure the Resulsts delivered by the Tagger which can be called as in the second Example in Usage.");
 			System.out.println("The Application supports 3 Types of HMM-Model Taggers (Unigram, Bigram & Trigram) and provides different");
-			System.out.println("strategies to fall back at in the Case a Tagger couldnt tag some Data.\n");
+			System.out.println("strategies to fall back at in the Case a Tagger couldn't tag some Data.\n");
 			
 			System.out.println("Details to the Options:\n");
 			System.out.println("\tOptions for the POS-Tagger:\n");
-			System.out.println(String.format("%25s\t", "-tr, --train")+"Specifies the File taken to Train the Taggers.\n");
-			System.out.println(String.format("%25s\t", "-tg, --tag")+"Specifies the File taken to be tagged by the Taggers.\n");
-			System.out.println(String.format("%25s\t", "-s, --strategy")+"Strategy the Tagger will take to fall back at.");
-			System.out.println(String.format("%25s\t","")+"Valid values:\n");
-			System.out.println(String.format("%25s\t","")+"\"s1\" - TrigramTagger > BigramTagger > UnigramTagger > DONE\n");
-			System.out.println(String.format("%25s\t","")+"\"s2\" - BigramTagger > UnigramTagger > DONE\n");
-			System.out.println(String.format("%25s\t","")+"\"s3\" - UnigramTagger > DONE\n");
-			System.out.println(String.format("%25s\t","")+"\"s4\" - BigramTagger > DONE\n");
-			System.out.println(String.format("%25s\t","")+"\"s5\" - TrigramTagger > DONE\n");
+			System.out.println(String.format("%25s\t", "-tr, --train") + "Specifies the File taken to Train the Taggers.\n");
+			System.out.println(String.format("%25s\t", "-tg, --tag") + "Specifies the File taken to be tagged by the Taggers.\n");
+			System.out.println(String.format("%25s\t", "-s, --strategy") + "Strategy the Tagger will take to fall back at.");
+			System.out.println(String.format("%25s\t","") + "Valid values:\n");
+			System.out.println(String.format("%25s\t","") + "\"s1\" - TrigramTagger > BigramTagger > UnigramTagger > DONE\n");
+			System.out.println(String.format("%25s\t","") + "\"s2\" - BigramTagger > UnigramTagger > DONE\n");
+			System.out.println(String.format("%25s\t","") + "\"s3\" - UnigramTagger > DONE\n");
+			System.out.println(String.format("%25s\t","") + "\"s4\" - BigramTagger > DONE\n");
+			System.out.println(String.format("%25s\t","") + "\"s5\" - TrigramTagger > DONE\n");
 			System.out.println("\tOptions for the Evaluator:\n");
-			System.out.println(String.format("%25s\t", "-e, --evaluator")+"Switches the Application into the Evaluationmode.\n");
-			System.out.println(String.format("%25s\t", "-g, --goldstandard")+"Specifies the Goldstandardfile taken to compare with the Taggeroutput.\n");
-			System.out.println(String.format("%25s\t", "-o, --output")+"Specifies the Taggeroutputfile taken to compare with the Goldstandard.\n");
+			System.out.println(String.format("%25s\t", "-e, --evaluator") + "Switches the Application into the Evaluationmode.\n");
+			System.out.println(String.format("%25s\t", "-g, --goldstandard") + "Specifies the Goldstandardfile taken to compare with the Taggeroutput.\n");
+			System.out.println(String.format("%25s\t", "-o, --output") + "Specifies the Taggeroutputfile taken to compare with the Goldstandard.\n");
 			//e.printStackTrace();
 		}
 	}
