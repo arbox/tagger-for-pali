@@ -17,16 +17,16 @@ all:
 	$(MAKE) compare
 
 prepare:
-	mkdir -p $(BIN_DIR)
+	mkdir -p "$(BIN_DIR)"
 	
 tagger:
-	$(ANT) -f $(TAGGER_DIR)/build.xml
-	cp $(TAGGER_DIR)/build/tagger.jar $(BIN_DIR)/tagger.jar
+	$(ANT) -f "$(TAGGER_DIR)/build.xml"
+	cp "$(TAGGER_DIR)/build/tagger.jar" "$(BIN_DIR)/tagger.jar"
 
 compare:
 	echo "To be implemented"
         
 clean:
-	$(ANT) -f $(TAGGER_DIR)/build.xml clean
-	rm -Rf $(BIN_DIR)
+	$(ANT) -f "$(TAGGER_DIR)/build.xml" clean
+	rm -Rf "$(BIN_DIR)"
 
