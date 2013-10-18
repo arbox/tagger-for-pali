@@ -293,11 +293,11 @@ public class ResourceManager {
 	public int export(String fileName){
 		setNoneTaggedToNotFound();
 		
-		File f;
+		//File f;
 		BufferedWriter w = null;
-		f=new File(fileName+".csv");
+		//f=new File(fileName+".csv");
 		try{
-			f.createNewFile();
+			//f.createNewFile();
 			w = new BufferedWriter(new FileWriter(fileName));
 			for(int i = 0; i<tag_data.size();i++){
 				w.write(tag_data.get(i)+"\n");
